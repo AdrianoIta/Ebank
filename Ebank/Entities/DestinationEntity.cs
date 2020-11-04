@@ -7,29 +7,39 @@ namespace Ebank.Entities
 {
     public class DestinationEntity
     {
-        public DestinationEntity(string id, string balance)
+        public DestinationEntity(string amount, string type, string destination)
         {
-            SetId(id);
-            SetBalance(balance);
+            SetAmount(amount);
+            SetType(type);
+            SetDestination(destination);
         }
 
-        public string Id { get; private set; }
-        public string Balance { get; private set; }
+        public string Amount { get; private set; }
+        public string Type { get; private set; }
+        public string Destination { get; private set; }
 
-        private void SetId(string id)
+        private void SetAmount(string amount)
         {
-            if (string.IsNullOrEmpty(id))
-                throw new ArgumentNullException("Id cannot be null or empty.");
-
-            Id = id;
-        }
-
-        private void SetBalance(string balance)
-        {
-            if (string.IsNullOrEmpty(balance))
+            if (string.IsNullOrEmpty(amount))
                 throw new ArgumentNullException("Balance cannot be null or empty.");
 
-            Balance = balance;
+            Amount = amount;
+        }
+
+        private void SetType(string type)
+        {
+            if (string.IsNullOrEmpty(type))
+                throw new ArgumentNullException("Type cannot be null or empty.");
+
+            Type = type;
+        }
+
+        private void SetDestination(string destination)
+        {
+            if (string.IsNullOrEmpty(destination))
+                throw new ArgumentNullException("Destination cannot be null or empty.");
+
+            Destination = destination;
         }
     }
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Ebank.Business;
 using Ebank.Models;
-using System.Net;
 using Microsoft.AspNetCore.Http;
-using Ebank.Business;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Ebank.Controllers
 {
@@ -15,43 +11,56 @@ namespace Ebank.Controllers
     public class AccountController : ControllerBase
     {
         private AccountBusiness AccountBusiness;
+        
 
         public AccountController(AccountBusiness accountBusiness)
         {
             AccountBusiness = accountBusiness;
         }
-        
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+
+        [HttpGet("GetBalance/{id}")]
+        public IActionResult GetBalance(int id)
         {
-            return new string[] { "value1", "value2" };
+            try
+            {
+                var amount = AccountBusiness.GetBalanceAccount(id);
+
+                return new ObjectResult(amount) { StatusCode = StatusCodes.Status200OK };
+            }
+            catch (ArgumentNullException ex)
+            {
+                return new ObjectResult(ex) { StatusCode = StatusCodes.Status404NotFound };
+            }
         }
 
-        
-        [HttpGet("GetAccount/{id}")]
-        public ActionResult<string> GetBalance(int id)
-        {
-            return "value";
-        }
-        
         [HttpPost("CreateAccount")]
-        public IActionResult CreateAccount(AccountModel account)
+        public IActionResult CreateAccount(DestinationModel destination)
         {
-            AccountBusiness.CreateAccount(account);
+            try
+            {
+                var account = AccountBusiness.CreateAccount(destination);
 
-            return new ObjectResult("OK") { StatusCode = StatusCodes.Status201Created };
+                return new ObjectResult(account) { StatusCode = StatusCodes.Status201Created };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPost("Deposit")]
+        public IActionResult Deposit(DestinationModel destination)
         {
-        }
+            try
+            {
+                var account = AccountBusiness.DepositIntoAccount(destination);
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+                return new ObjectResult(account) { StatusCode = StatusCodes.Status201Created };
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(ex) { StatusCode = StatusCodes.Status404NotFound };
+            }
         }
     }
 }

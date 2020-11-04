@@ -1,31 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Ebank.Entities
 {
     public class AccountEntity
     {
-        public AccountEntity(string type,
-            string amount,
-            DestinationEntity destination)
+        public AccountEntity(string id, string amount)
         {
-            SetType(type);
+            SetId(id);
             SetAmount(amount);
-            SetDestination(destination);
         }
 
-        public string Type { get; set; }
+        public string Id { get; private set; }
         public string Amount { get; set; }
-        public DestinationEntity Destination { get; set; }
 
-        private void SetType(string type)
+        private void SetId(string id)
         {
-            if (string.IsNullOrEmpty(type))
-                throw new ArgumentNullException("Type cannot be null or empty.");
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentNullException("Id cannot be null or empty.");
 
-            Type = type;
+            Id = id;
         }
 
         private void SetAmount(string amount)
@@ -34,13 +27,6 @@ namespace Ebank.Entities
                 throw new ArgumentNullException("Amount cannot be null or empty.");
 
             Amount = amount;
-        }
-
-        private void SetDestination(DestinationEntity destination)
-        {
-            var newDestination = new DestinationEntity(destination.Id, destination.Balance);
-
-            Destination = destination;
         }
     }
 }
