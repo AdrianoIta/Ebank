@@ -1,4 +1,5 @@
 ﻿using Ebank.Business;
+using Ebank.Business.Interfaces;
 using Ebank.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +11,10 @@ namespace Ebank.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private AccountBusiness AccountBusiness;
+        private IAccountBusiness AccountBusiness;
         
 
-        public AccountController(AccountBusiness accountBusiness)
+        public AccountController(IAccountBusiness accountBusiness)
         {
             AccountBusiness = accountBusiness;
         }

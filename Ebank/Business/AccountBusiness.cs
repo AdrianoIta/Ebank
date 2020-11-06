@@ -1,16 +1,15 @@
-﻿using Ebank.Entities;
+﻿using Ebank.Business.Interfaces;
+using Ebank.Entities;
 using Ebank.Factories.Interfaces;
-using Ebank.Factorys;
 using Ebank.Models;
 using Ebank.Updater.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Ebank.Business
 {
-    public class AccountBusiness
+    public class AccountBusiness : IAccountBusiness
     {
         private List<AccountEntity> Accounts;
         private IAccountFactory AccountFactory;

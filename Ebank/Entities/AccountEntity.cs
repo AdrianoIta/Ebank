@@ -23,9 +23,6 @@ namespace Ebank.Entities
 
         private void SetAmount(string amount)
         {
-            if (string.IsNullOrEmpty(amount))
-                throw new ArgumentNullException("Amount cannot be null or empty.");
-
             Amount = amount;
         }
     }

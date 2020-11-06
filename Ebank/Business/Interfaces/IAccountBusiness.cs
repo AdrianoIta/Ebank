@@ -29,7 +29,6 @@ namespace Ebank.Business.Interfaces
         /// </summary>
         /// <param name="destination"></param>
         /// <returns></returns>
-        AccountEntity DepositIntoAccount(DestinationModel destination)
-
+        AccountEntity DepositIntoAccount(DestinationModel destination);
     }
 }
