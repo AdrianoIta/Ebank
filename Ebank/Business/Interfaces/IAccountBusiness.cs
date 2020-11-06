@@ -21,7 +21,7 @@ namespace Ebank.Business.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        string GetBalanceAccount(int id);
+        AccountEntity GetBalanceAccount(int id);
 
         /// <summary>
         /// Method responsible to update the amount of money on the account

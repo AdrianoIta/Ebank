@@ -12,27 +12,24 @@ namespace Ebank.Controllers
     public class AccountController : ControllerBase
     {
         private IAccountBusiness AccountBusiness;
-        
+
 
         public AccountController(IAccountBusiness accountBusiness)
         {
             AccountBusiness = accountBusiness;
         }
 
-        [HttpGet("GetBalance/{id}")]
+        [HttpGet("GetBalance")]
         public IActionResult GetBalance(int id)
         {
-            try
-            {
-                var amount = AccountBusiness.GetBalanceAccount(id);
+            var account = AccountBusiness.GetBalanceAccount(id);
 
-                return new ObjectResult(amount) { StatusCode = StatusCodes.Status200OK };
-            }
-            catch (ArgumentNullException ex)
-            {
-                return new ObjectResult(ex) { StatusCode = StatusCodes.Status404NotFound };
-            }
+            if (account != null)
+                return new ObjectResult(account.Amount) { StatusCode = StatusCodes.Status200OK };
+
+            return new ObjectResult("Account Not Found.") { StatusCode = StatusCodes.Status404NotFound };
         }
+
 
         [HttpPost("CreateAccount")]
         public IActionResult CreateAccount(DestinationModel destination)
