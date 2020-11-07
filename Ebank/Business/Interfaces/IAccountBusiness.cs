@@ -30,5 +30,12 @@ namespace Ebank.Business.Interfaces
         /// <param name="destination"></param>
         /// <returns></returns>
         AccountEntity DepositIntoAccount(DestinationModel destination);
+
+        /// <summary>
+        /// Method responsible to withdraw a amount from the account
+        /// </summary>
+        /// <param name="withdraw"></param>
+        /// <returns></returns>
+        AccountEntity WithdrawFromAccount(WithdrawModel withdraw);
     }
 }

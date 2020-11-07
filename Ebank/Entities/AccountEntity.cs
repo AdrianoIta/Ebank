@@ -4,14 +4,14 @@ namespace Ebank.Entities
 {
     public class AccountEntity
     {
-        public AccountEntity(string id, string amount)
+        public AccountEntity(string id, string balance)
         {
             SetId(id);
-            SetAmount(amount);
+            SetAmount(balance);
         }
 
         public string Id { get; private set; }
-        public string Amount { get; set; }
+        public string Balance { get; set; }
 
         private void SetId(string id)
         {
@@ -23,7 +23,7 @@ namespace Ebank.Entities
 
         private void SetAmount(string amount)
         {
-            Amount = amount;
+            Balance = amount;
         }
     }
 }

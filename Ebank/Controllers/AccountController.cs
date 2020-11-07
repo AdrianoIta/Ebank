@@ -25,7 +25,7 @@ namespace Ebank.Controllers
             var account = AccountBusiness.GetBalanceAccount(id);
 
             if (account != null)
-                return new ObjectResult(account.Amount) { StatusCode = StatusCodes.Status200OK };
+                return new ObjectResult(account.Balance) { StatusCode = StatusCodes.Status200OK };
 
             return new ObjectResult("Account Not Found.") { StatusCode = StatusCodes.Status404NotFound };
         }
@@ -52,6 +52,21 @@ namespace Ebank.Controllers
             try
             {
                 var account = AccountBusiness.DepositIntoAccount(destination);
+
+                return new ObjectResult(account) { StatusCode = StatusCodes.Status201Created };
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(ex) { StatusCode = StatusCodes.Status404NotFound };
+            }
+        }
+
+        [HttpPost("Withdraw")]
+        public IActionResult Withdraw(WithdrawModel withdraw)
+        {
+            try
+            {
+                var account = AccountBusiness.WithdrawFromAccount(withdraw);
 
                 return new ObjectResult(account) { StatusCode = StatusCodes.Status201Created };
             }

@@ -1,14 +1,14 @@
 ﻿using Ebank.Business.Interfaces;
 using Ebank.Entities;
 using Ebank.Factories.Interfaces;
+using Ebank.Helpers;
 using Ebank.Models;
 using Ebank.Updater.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using System.Text;
 
 namespace Ebank.Business
 {
@@ -28,21 +28,17 @@ namespace Ebank.Business
         {
             try
             {
+                var fileHelper = new FileHelper();
+
                 var account = new AccountModel()
                 {
-                    Id = destination.Id,
+                    Id = destination.Destination,
                     Amount = destination.Amount
                 };
 
                 var newAccount = AccountFactory.Create(account);
 
-                using (StreamWriter sw = new StreamWriter(AccountFileName, true))
-                {
-                    sw.WriteLine();
-                    sw.Write(JsonConvert.SerializeObject(account));
-
-                    sw.Dispose();
-                }
+                fileHelper.CreateFile(JsonConvert.SerializeObject(newAccount));
 
                 return newAccount;
             }
@@ -56,7 +52,7 @@ namespace Ebank.Business
         {
             try
             {
-                return GetAccountById(id.ToString());
+                return GetAccountBy(id.ToString());
             }
             catch (InvalidOperationException)
             {
@@ -76,9 +72,40 @@ namespace Ebank.Business
             }
         }
 
+        public AccountEntity WithdrawFromAccount(WithdrawModel withdraw)
+        {
+            try
+            {
+                var account = GetAccountBy(withdraw.Origin);
+
+                if (account == null)
+                    throw new Exception("Account Not Found");
+
+                var accountUpdated = Withdraw(account, withdraw);
+
+                UpdateAccount(accountUpdated);
+
+                return accountUpdated;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private AccountEntity Withdraw(AccountEntity account, WithdrawModel withdraw)
+        {
+            var accountBalance = Convert.ToDecimal(account.Balance);
+            var withdrawAmount = Convert.ToDecimal(withdraw.Amount);
+
+            account.Balance = (accountBalance - withdrawAmount).ToString();
+
+            return account;
+        }
+
         private AccountEntity Deposit(DestinationModel destination)
         {
-            var account = GetAccountById(destination.Id);
+            var account = GetAccountBy(destination.Destination);
 
             var newAccount = new AccountModel()
             {
@@ -98,12 +125,12 @@ namespace Ebank.Business
         private decimal SumAmountValues(AccountModel destination, AccountEntity account)
         {
             var value = Convert.ToDecimal(destination.Amount);
-            var accountAmount = Convert.ToDecimal(account.Amount);
+            var accountAmount = Convert.ToDecimal(account.Balance);
 
             return decimal.Add(value, accountAmount);
         }
 
-        private AccountEntity GetAccountById(string id)
+        private AccountEntity GetAccountBy(string id)
         {
             var allAccountsFromFile = File.ReadAllLines(AccountFileName);
             var allAccounts = new List<AccountEntity>();
@@ -119,6 +146,25 @@ namespace Ebank.Business
 
         private void UpdateAccount(AccountEntity accountUpdated)
         {
+            var fileHelper = new FileHelper(); 
+            var allAccounts = GetAllAccounts(accountUpdated);
+
+            fileHelper.ClearFile();
+
+            using (StreamWriter sw = new StreamWriter(AccountFileName, true))
+            {
+                foreach (var account in allAccounts)
+                {
+                    sw.WriteLine();
+                    sw.Write(JsonConvert.SerializeObject(account));
+                }
+
+                sw.Dispose();
+            }
+        }
+
+        private static List<AccountEntity> GetAllAccounts(AccountEntity accountUpdated)
+        {
             var allAccountsFromFile = File.ReadAllLines(AccountFileName);
             var allAccounts = new List<AccountEntity>();
 
@@ -130,26 +176,10 @@ namespace Ebank.Business
 
             allAccounts.RemoveAll(x => x.Id == accountUpdated.Id);
             allAccounts.Add(accountUpdated);
-            ClearFile();
 
-            using (StreamWriter sw = new StreamWriter(AccountFileName, true))
-            {
-                foreach (var account in allAccounts)
-                {
-                    sw.WriteLine();
-                    sw.Write(JsonConvert.SerializeObject(account));
-                }
-                sw.Dispose();
-            }
+            return allAccounts;
         }
 
-        private void ClearFile()
-        {
-            using (StreamWriter sw = new StreamWriter(AccountFileName, false))
-            {
-                sw.WriteLine("");
-                sw.Close();
-            }
-        }
+       
     }
 }

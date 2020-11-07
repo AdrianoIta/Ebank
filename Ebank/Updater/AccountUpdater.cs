@@ -12,7 +12,7 @@ namespace Ebank.Updater
     {
         public AccountEntity Update(AccountEntity accountUpdate, AccountModel account)
         {
-            accountUpdate.Amount = account.Amount;
+            accountUpdate.Balance = account.Amount;
 
             return accountUpdate;
         }
