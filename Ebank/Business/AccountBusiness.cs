@@ -24,7 +24,7 @@ namespace Ebank.Business
             AccountUpdater = accountUpdater;
         }
 
-        public AccountEntity CreateAccount(DestinationModel destination)
+        public AccountModel CreateAccount(DestinationModel destination)
         {
             try
             {
@@ -33,14 +33,14 @@ namespace Ebank.Business
                 var account = new AccountModel()
                 {
                     Id = destination.Destination,
-                    Amount = destination.Amount
+                    Balance = destination.Amount
                 };
 
                 var newAccount = AccountFactory.Create(account);
 
                 fileHelper.CreateFile(JsonConvert.SerializeObject(newAccount));
 
-                return newAccount;
+                return account;
             }
             catch (ArgumentNullException ex)
             {
@@ -48,7 +48,7 @@ namespace Ebank.Business
             }
         }
 
-        public AccountEntity GetBalanceAccount(int id)
+        public AccountModel GetBalanceAccount(int id)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace Ebank.Business
             }
         }
 
-        public AccountEntity DepositIntoAccount(DestinationModel destination)
+        public AccountModel DepositIntoAccount(DestinationModel destination)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace Ebank.Business
             }
         }
 
-        public AccountEntity WithdrawFromAccount(WithdrawModel withdraw)
+        public AccountModel WithdrawFromAccount(WithdrawModel withdraw)
         {
             try
             {
@@ -93,60 +93,50 @@ namespace Ebank.Business
             }
         }
 
-        private AccountEntity Withdraw(AccountEntity account, WithdrawModel withdraw)
+        private static AccountModel Withdraw(AccountModel account, WithdrawModel withdraw)
         {
-            var accountBalance = Convert.ToDecimal(account.Balance);
-            var withdrawAmount = Convert.ToDecimal(withdraw.Amount);
-
-            account.Balance = (accountBalance - withdrawAmount).ToString();
+            account.Balance = decimal.Subtract(account.Balance, withdraw.Amount);
 
             return account;
         }
 
-        private AccountEntity Deposit(DestinationModel destination)
+        private AccountModel Deposit(DestinationModel destination)
         {
-            var account = GetAccountBy(destination.Destination);
+            var currentAccount = GetAccountBy(destination.Destination);
 
-            var newAccount = new AccountModel()
-            {
-                Amount = destination.Amount
-            };
+            var account = new AccountEntity(currentAccount.Id, currentAccount.Balance);
 
-            var newAmount = SumAmountValues(newAccount, account).ToString();
-            newAccount.Amount = newAmount;
+            currentAccount.Balance = decimal.Add(currentAccount.Balance, account.Balance);
 
-            var updatedAccount = AccountUpdater.Update(account, newAccount);
+            UpdateAccount(currentAccount);
 
-            UpdateAccount(updatedAccount);
-
-            return updatedAccount;
+            return currentAccount;
         }
 
-        private decimal SumAmountValues(AccountModel destination, AccountEntity account)
+        private AccountModel GetAccountBy(string id)
         {
-            var value = Convert.ToDecimal(destination.Amount);
-            var accountAmount = Convert.ToDecimal(account.Balance);
-
-            return decimal.Add(value, accountAmount);
-        }
-
-        private AccountEntity GetAccountBy(string id)
-        {
-            var allAccountsFromFile = File.ReadAllLines(AccountFileName);
-            var allAccounts = new List<AccountEntity>();
-
-            foreach (var account in allAccountsFromFile)
+            try
             {
-                if (!string.IsNullOrEmpty(account))
-                    allAccounts.Add(JsonConvert.DeserializeObject<AccountEntity>(account));
+                var allAccountsFromFile = File.ReadAllLines(AccountFileName);
+                var allAccounts = new List<AccountModel>();
+
+                foreach (var account in allAccountsFromFile)
+                {
+                    if (!string.IsNullOrEmpty(account))
+                        allAccounts.Add(JsonConvert.DeserializeObject<AccountModel>(account));
+                }
+
+                return allAccounts.Single(x => x.Id.Equals(id));
             }
-
-            return allAccounts.FirstOrDefault(x => x.Id.Equals(id));
+            catch (ArgumentNullException ex)
+            {
+                throw new ArgumentException("Account not found.", ex.Message);
+            }
         }
 
-        private void UpdateAccount(AccountEntity accountUpdated)
+        private static void UpdateAccount(AccountModel accountUpdated)
         {
-            var fileHelper = new FileHelper(); 
+            var fileHelper = new FileHelper();
             var allAccounts = GetAllAccounts(accountUpdated);
 
             fileHelper.ClearFile();
@@ -163,15 +153,15 @@ namespace Ebank.Business
             }
         }
 
-        private static List<AccountEntity> GetAllAccounts(AccountEntity accountUpdated)
+        private static List<AccountModel> GetAllAccounts(AccountModel accountUpdated)
         {
             var allAccountsFromFile = File.ReadAllLines(AccountFileName);
-            var allAccounts = new List<AccountEntity>();
+            var allAccounts = new List<AccountModel>();
 
             foreach (var account in allAccountsFromFile)
             {
                 if (!string.IsNullOrEmpty(account))
-                    allAccounts.Add(JsonConvert.DeserializeObject<AccountEntity>(account));
+                    allAccounts.Add(JsonConvert.DeserializeObject<AccountModel>(account));
             }
 
             allAccounts.RemoveAll(x => x.Id == accountUpdated.Id);
@@ -180,6 +170,33 @@ namespace Ebank.Business
             return allAccounts;
         }
 
-       
+        public TransferToAccountModel TransferToAccount(TransferModel transfer)
+        {
+            try
+            {
+                var destinationAccount = GetAccountBy(transfer.Destination);
+                var originAccount = GetAccountBy(transfer.Origin);
+
+                OriginAccountHasSufficientFunds(originAccount, transfer);
+
+                originAccount.Balance = originAccount.Balance - transfer.Amount;
+                destinationAccount.Balance = destinationAccount.Balance + transfer.Amount;
+
+                UpdateAccount(destinationAccount);
+                UpdateAccount(originAccount);
+
+                return new TransferToAccountModel() { Destination = destinationAccount, Origin = originAccount };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private static void OriginAccountHasSufficientFunds(AccountModel originAccount, TransferModel transfer)
+        {
+            if (originAccount.Balance < transfer.Amount)
+                throw new Exception("The Origin Account Has No Sufficient Funds to Proceed With the Transference.");
+        }
     }
 }

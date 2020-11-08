@@ -8,7 +8,7 @@ namespace Ebank.Factorys
     {
         public AccountEntity Create(AccountModel model)
         {
-            return new AccountEntity(model.Id, model.Amount);
+            return new AccountEntity(model.Id, model.Balance);
         }
     }
 }

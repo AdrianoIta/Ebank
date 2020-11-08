@@ -75,5 +75,20 @@ namespace Ebank.Controllers
                 return new ObjectResult(ex) { StatusCode = StatusCodes.Status404NotFound };
             }
         }
+
+        [HttpPost("Transfer")]
+        public IActionResult Transfer(TransferModel transfer)
+        {
+            try
+            {
+                var transference = AccountBusiness.TransferToAccount(transfer);
+
+                return new ObjectResult(transference) { StatusCode = StatusCodes.Status201Created };
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(ex) { StatusCode = StatusCodes.Status404NotFound };
+            }
+        }
     }
 }

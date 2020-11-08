@@ -14,14 +14,14 @@ namespace Ebank.Business.Interfaces
         /// </summary>
         /// <param name="destination"></param>
         /// <returns></returns>
-        AccountEntity CreateAccount(DestinationModel destination);
+        AccountModel CreateAccount(DestinationModel destination);
 
         /// <summary>
         /// Method responsible to return the balance amount of a specific account
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        AccountEntity GetBalanceAccount(int id);
+        AccountModel GetBalanceAccount(int id);
 
         /// <summary>
         /// Method responsible to update the amount of money on the account
@@ -29,13 +29,20 @@ namespace Ebank.Business.Interfaces
         /// </summary>
         /// <param name="destination"></param>
         /// <returns></returns>
-        AccountEntity DepositIntoAccount(DestinationModel destination);
+        AccountModel DepositIntoAccount(DestinationModel destination);
 
         /// <summary>
         /// Method responsible to withdraw a amount from the account
         /// </summary>
         /// <param name="withdraw"></param>
         /// <returns></returns>
-        AccountEntity WithdrawFromAccount(WithdrawModel withdraw);
+        AccountModel WithdrawFromAccount(WithdrawModel withdraw);
+
+        /// <summary>
+        /// Method that will consolidate the transference from one account to another
+        /// </summary>
+        /// <param name="withdraw"></param>
+        /// <returns></returns>
+        TransferToAccountModel TransferToAccount(TransferModel withdraw);
     }
 }
