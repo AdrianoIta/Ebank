@@ -17,9 +17,8 @@ namespace Ebank.Controllers
         {
             try
             {
-                var fileHelper = new FileHelper();
 
-                fileHelper.ClearFile();
+                FileHelper.ClearFile();
 
                 return new ObjectResult("Ok") { StatusCode = StatusCodes.Status201Created };
             }

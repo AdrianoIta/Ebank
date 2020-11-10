@@ -13,7 +13,6 @@ namespace Ebank.Controllers
     {
         private IAccountBusiness AccountBusiness;
 
-
         public AccountController(IAccountBusiness accountBusiness)
         {
             AccountBusiness = accountBusiness;
@@ -22,14 +21,17 @@ namespace Ebank.Controllers
         [HttpGet("GetBalance")]
         public IActionResult GetBalance(int id)
         {
-            var account = AccountBusiness.GetBalanceAccount(id);
+            try
+            {
+                var account = AccountBusiness.GetBalanceAccount(id);
 
-            if (account != null)
                 return new ObjectResult(account.Balance) { StatusCode = StatusCodes.Status200OK };
-
-            return new ObjectResult("Account Not Found.") { StatusCode = StatusCodes.Status404NotFound };
+            }
+            catch (Exception)
+            {
+                return new ObjectResult("Error") { StatusCode = StatusCodes.Status404NotFound };
+            }
         }
-
 
         [HttpPost("CreateAccount")]
         public IActionResult CreateAccount(DestinationModel destination)
@@ -40,9 +42,9 @@ namespace Ebank.Controllers
 
                 return new ObjectResult(account) { StatusCode = StatusCodes.Status201Created };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                throw new Exception("The account could not be created.");
             }
         }
 
@@ -55,9 +57,9 @@ namespace Ebank.Controllers
 
                 return new ObjectResult(account) { StatusCode = StatusCodes.Status201Created };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return new ObjectResult(ex) { StatusCode = StatusCodes.Status404NotFound };
+                return new ObjectResult("Error") { StatusCode = StatusCodes.Status404NotFound };
             }
         }
 
@@ -70,9 +72,9 @@ namespace Ebank.Controllers
 
                 return new ObjectResult(account) { StatusCode = StatusCodes.Status201Created };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return new ObjectResult(ex) { StatusCode = StatusCodes.Status404NotFound };
+                return new ObjectResult("Error") { StatusCode = StatusCodes.Status404NotFound };
             }
         }
 
@@ -85,9 +87,9 @@ namespace Ebank.Controllers
 
                 return new ObjectResult(transference) { StatusCode = StatusCodes.Status201Created };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return new ObjectResult(ex) { StatusCode = StatusCodes.Status404NotFound };
+                return new ObjectResult("Error") { StatusCode = StatusCodes.Status404NotFound };
             }
         }
     }
