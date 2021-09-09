@@ -1,9 +1,5 @@
 ﻿using Ebank.Entities;
 using Ebank.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Ebank.Business.Interfaces
 {
@@ -14,7 +10,7 @@ namespace Ebank.Business.Interfaces
         /// </summary>
         /// <param name="destination"></param>
         /// <returns></returns>
-        AccountModel CreateAccount(DestinationModel destination);
+        AccountModel CreateAccount(AccountModel destination);
 
         /// <summary>
         /// Method responsible to return the balance amount of a specific account

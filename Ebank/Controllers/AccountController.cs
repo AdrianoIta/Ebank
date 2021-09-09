@@ -1,5 +1,6 @@
 ﻿using Ebank.Business;
 using Ebank.Business.Interfaces;
+using Ebank.Helpers;
 using Ebank.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,13 +35,13 @@ namespace Ebank.Controllers
         }
 
         [HttpPost("CreateAccount")]
-        public IActionResult CreateAccount(DestinationModel destination)
+        public IActionResult CreateAccount(AccountModel account)
         {
             try
             {
-                var account = AccountBusiness.CreateAccount(destination);
+                var newAccount = AccountBusiness.CreateAccount(account);
 
-                return new ObjectResult(account) { StatusCode = StatusCodes.Status201Created };
+                return new ObjectResult(newAccount) { StatusCode = StatusCodes.Status201Created };
             }
             catch (Exception)
             {
@@ -90,6 +91,21 @@ namespace Ebank.Controllers
             catch (Exception)
             {
                 return new ObjectResult("Error") { StatusCode = StatusCodes.Status404NotFound };
+            }
+        }
+
+        [HttpPost("Reset")]
+        public IActionResult Reset()
+        {
+            try
+            {
+                FileHelper.ClearFile();
+
+                return new ObjectResult("Ok") { StatusCode = StatusCodes.Status201Created };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

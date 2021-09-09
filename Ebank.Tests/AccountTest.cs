@@ -1,26 +1,32 @@
-using Ebank.Business;
-using Ebank.Controllers;
-using Ebank.Factories.Interfaces;
-using Ebank.Factorys;
+using Ebank.Business.Interfaces;
 using Ebank.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
 using Xunit;
 
 namespace Ebank.Tests
 {
     public class AccountTest
     {
-        [Fact]
-        public void CreateAccount()
-        {
-            ////Act
-            //var accountFactory = new AccountFactory();
-            //var accountBusiness = new AccountBusiness(accountFactory);
-            //var accountControler = new AccountController(accountBusiness);
+        private static IAccountBusiness AccountBusiness;
 
-            ////Arrange
+        public AccountTest(IAccountBusiness accountBusiness)
+        {
+            AccountBusiness = accountBusiness;
+        }
+
+        [Fact]
+        private static void CreateAccount(decimal amount, string destination, )
+        {
+            //Arrange
+            var destination = new DestinationModel()
+            {
+                Amount = amount,
+                Destination = destination,
+
+            };
+
+            AccountBusiness.CreateAccount(destination);
+
+            ////Act
             //var destinationAccount = new DestinationModel() { Id = "1", Amount = "10", Type = "Deposit"};
             //var actionResult = accountControler.CreateAccount(destinationAccount);
             //var actionStatusCode = actionResult as ObjectResult;

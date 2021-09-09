@@ -1,4 +1,5 @@
 ﻿using Ebank.Business.Interfaces;
+using Ebank.Entities;
 using Ebank.Helpers;
 using Ebank.Models;
 using Newtonsoft.Json;
@@ -12,23 +13,19 @@ namespace Ebank.Business
 
         public AccountBusiness() { }
 
-        public AccountModel CreateAccount(DestinationModel destination)
+        public AccountModel CreateAccount(AccountModel account)
         {
             try
             {
-                var account = new AccountModel()
-                {
-                    Id = destination.Destination,
-                    Balance = destination.Amount
-                };
+                var newAccount = new AccountEntity(account.Id, account.Balance);
 
-                FileHelper.CreateFile(JsonConvert.SerializeObject(account));
+                FileHelper.CreateFile(JsonConvert.SerializeObject(newAccount));
 
                 return account;
             }
-            catch (ArgumentNullException ex)
+            catch (ArgumentNullException)
             {
-                throw new ArgumentNullException(ex.Message);
+                throw new ArgumentNullException();
             }
         }
 
