@@ -90,7 +90,7 @@ namespace Ebank.Helpers
                         accounts.Add(JsonConvert.DeserializeObject<AccountModel>(account));
                 }
 
-                return accounts.Single(x => x.Id.Equals(id));
+                return accounts.SingleOrDefault(x => x.Id == id);
             }
             catch (ArgumentNullException ex)
             {

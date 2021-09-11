@@ -20,7 +20,7 @@ namespace Ebank.Controllers
         }
 
         [HttpGet("GetBalance")]
-        public IActionResult GetBalance(int id)
+        public IActionResult GetBalance(string id)
         {
             try
             {

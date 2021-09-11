@@ -29,13 +29,13 @@ namespace Ebank.Business
             }
         }
 
-        public AccountModel GetBalanceAccount(int id)
+        public AccountModel GetBalanceAccount(string id)
         {
             try
             {
-                return FileHelper.GetAccountFromFile(id.ToString());
+                return FileHelper.GetAccountFromFile(id);
             }
-            catch (InvalidOperationException)
+            catch (ArgumentNullException)
             {
                 throw new InvalidOperationException("Account not found");
             }
@@ -100,7 +100,7 @@ namespace Ebank.Business
         {
             var currentAccount = FileHelper.GetAccountFromFile(destination.Destination);
 
-            currentAccount.Balance = decimal.Add(currentAccount.Balance, currentAccount.Balance);
+            currentAccount.Balance = decimal.Add(currentAccount.Balance, destination.Amount);
 
             UpdateAccount(currentAccount);
 
