@@ -9,17 +9,14 @@ namespace Ebank.Business
 {
     public class AccountBusiness : IAccountBusiness
     {
-        private const string AccountFileName = "..\\Accounts.txt";
-
         public AccountBusiness() { }
 
         public AccountModel CreateAccount(AccountModel account)
         {
             try
             {
-                var newAccount = new AccountEntity(account.Id, account.Balance);
-
-                FileHelper.CreateFile(JsonConvert.SerializeObject(newAccount));
+                AccountDataIsValid(account);
+                FileHelper.CreateFile(account);
 
                 return account;
             }
@@ -122,6 +119,15 @@ namespace Ebank.Business
         {
             if (originAccount.Balance < transfer.Amount)
                 throw new Exception("The origin account has no sufficient funds to proceed with the transference.");
+        }
+
+        private void AccountDataIsValid(AccountModel account)
+        {
+            if (string.IsNullOrEmpty(account.Id))
+                throw new ArgumentNullException();
+
+            if (account.Balance == 0)
+                throw new ArgumentNullException();
         }
     }
 }

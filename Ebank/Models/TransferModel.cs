@@ -7,7 +7,6 @@ namespace Ebank.Models
 {
     public class TransferModel
     {
-        public string Type { get; set; }
         public string Origin { get; set; }
         public decimal Amount { get; set; }
         public string Destination { get; set; }

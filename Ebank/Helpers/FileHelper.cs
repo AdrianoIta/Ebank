@@ -20,14 +20,21 @@ namespace Ebank.Helpers
             }
         }
 
-        public static void CreateFile(string content)
+        public static void CreateFile(AccountModel account)
         {
-            using (StreamWriter sw = new StreamWriter(AccountFileName, true))
+            if (AccountExistInFile(account))
             {
-                sw.WriteLine();
-                sw.Write(content);
+                UpdateAccountFile(account);
+            }
+            else
+            {
+                using (StreamWriter sw = new StreamWriter(AccountFileName, true))
+                {
+                    sw.WriteLine();
+                    sw.Write(JsonConvert.SerializeObject(account));
 
-                sw.Dispose();
+                    sw.Dispose();
+                }
             }
         }
 
@@ -90,12 +97,19 @@ namespace Ebank.Helpers
                         accounts.Add(JsonConvert.DeserializeObject<AccountModel>(account));
                 }
 
-                return accounts.SingleOrDefault(x => x.Id == id);
+                return accounts.FirstOrDefault(x => x.Id == id);
             }
             catch (ArgumentNullException ex)
             {
                 throw new ArgumentException(ex.Message);
             }
+        }
+
+        private static bool AccountExistInFile(AccountModel account)
+        {
+            var existentAccount = GetAccountFromFile(account.Id);
+
+            return existentAccount != null;
         }
     }
 }

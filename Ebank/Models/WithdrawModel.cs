@@ -7,7 +7,6 @@ namespace Ebank.Models
 {
     public class WithdrawModel
     {
-        public string Type { get; set; }
         public string Origin { get; set; }
         public decimal Amount { get; set; }
     }

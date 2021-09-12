@@ -2,19 +2,22 @@ using Ebank.Business;
 using Ebank.Models;
 using System;
 using Xunit;
+using Ebank.Helpers;
 
 namespace Ebank.Test
 {
     public class AccountTest
     {
-        [Fact]
-        public void CreateAccountTest()
+        [Theory]
+        [InlineData(100, "1")]
+        [InlineData(100, "2")]
+        public void CreateAccountTest(decimal balance, string id)
         {
             // Arrange
             var accountBusiness = new AccountBusiness();
 
             //Act
-            var account = accountBusiness.CreateAccount(new AccountModel() { Balance = 100, Id = "1000" });
+            var account = accountBusiness.CreateAccount(new AccountModel() { Balance = balance, Id = id });
 
             //Assert
             Assert.NotNull(account.Id);
@@ -48,7 +51,7 @@ namespace Ebank.Test
         }
 
         [Theory]
-        [InlineData("1")]
+        [InlineData("3")]
         public void GetBalanceToInexistentAccountTest(string accountId)
         {
             //Arrange
@@ -62,7 +65,7 @@ namespace Ebank.Test
         }
 
         [Theory]
-        [InlineData("1000")]
+        [InlineData("1")]
         public void GetBalanceToExistentAccountTest(string accountId)
         {
             //Arrange
@@ -73,38 +76,81 @@ namespace Ebank.Test
 
             //Assert
             Assert.NotNull(balance);
-            Assert.Equal(accountId.ToString(), balance.Id);
+            Assert.Equal(accountId, balance.Id);
         }
 
         [Theory]
-        [InlineData(100, "1")]
+        [InlineData(100, "3")]
         public void DepositIntoAnInexistentAccountTest(decimal amount, string destination)
         {
             //Arrange
             var accountBusiness = new AccountBusiness();
+            var deposit = new DestinationModel()
+            {
+                Amount = amount,
+                Destination = destination
+            };
 
-            //Act
-            var deposit = new DestinationModel() { Amount = amount, Destination = destination};
-            
             //Assert
             Assert.Throws<NullReferenceException>(() => accountBusiness.DepositIntoAccount(deposit));
         }
 
         [Theory]
-        [InlineData(100, "1000")]
-        public void DepositIntoAnExistentAccount(decimal amount, string destination)
+        [InlineData(100, "1")]
+        public void DepositIntoAnExistentAccountTest(decimal amount, string destination)
         {
             //Arrange
             var accountBusiness = new AccountBusiness();
+            var deposit = new DestinationModel()
+            {
+                Amount = amount,
+                Destination = destination
+            };
 
             //Act
             var balance = accountBusiness.GetBalanceAccount(destination);
-            var deposit = new DestinationModel() { Amount = amount, Destination = destination };
             var account = accountBusiness.DepositIntoAccount(deposit);
 
             //Assert
             Assert.Equal(decimal.Add(balance.Balance, amount), account.Balance);
         }
 
+        [Theory]
+        [InlineData(10, "1", "2")]
+        [InlineData(20, "2", "1")]
+        public void TransferBetweenAccountsTest(decimal amount, string destination, string origin)
+        {
+            //Arrange
+            var accountBusiness = new AccountBusiness();
+
+            //Act
+            var balanceDestination = accountBusiness.GetBalanceAccount(destination);
+            var transferData = new TransferModel() { Amount = amount, Destination = destination, Origin = origin };
+            var transfer = accountBusiness.TransferToAccount(transferData);
+
+            //Assert
+            Assert.Equal(decimal.Add(balanceDestination.Balance, amount), transfer.Destination.Balance);
+        }
+
+        [Theory]
+        [InlineData(10, "1")]
+        [InlineData(20, "2")]
+        public void WithdrawFromExistentAccountTest(decimal amount, string origin)
+        {
+            //Arrange
+            var accountBusiness = new AccountBusiness();
+            var withdraw = new WithdrawModel()
+            {
+                Amount = amount,
+                Origin = origin
+            };
+
+            //Act
+            var balanceAccount = accountBusiness.GetBalanceAccount(origin);
+            var account = accountBusiness.WithdrawFromAccount(withdraw);
+
+            //Assert
+            Assert.Equal(decimal.Subtract(balanceAccount.Balance, amount), account.Balance);
+        }
     }
 }

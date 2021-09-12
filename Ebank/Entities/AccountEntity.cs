@@ -13,9 +13,9 @@ namespace Ebank.Entities
             SetBalance(balance);
         }
 
-        private string Id { get; set; }
+        public string Id { get; private set; }
 
-        private decimal Balance { get; set; }
+        public decimal Balance { get; private set; }
 
         private void SetId(string id)
         {
